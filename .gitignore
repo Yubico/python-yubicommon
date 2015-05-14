@@ -1,0 +1,8 @@
+*.pyc
+*.egg-info
+*.egg/
+build/
+dist/
+.ropeproject/
+ChangeLog
+MANIFEST
