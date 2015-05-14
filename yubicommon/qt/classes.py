@@ -117,7 +117,7 @@ class Application(QtGui.QApplication):
         self.window.raise_()
 
     def exec_(self):
-        status = super(self, Application).exec_()
+        status = super(Application, self).exec_()
         self.worker.thread().quit()
         self.deleteLater()
         time.sleep(0.01)  # Without this the process sometimes stalls.
