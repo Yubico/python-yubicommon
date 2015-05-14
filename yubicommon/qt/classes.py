@@ -66,17 +66,42 @@ class _Headers(object):
         return QtGui.QLabel(section)
 
 
+class MainWindow(QtGui.QMainWindow):
+
+    def __init__(self, settings=None):
+        super(MainWindow, self).__init__()
+
+        self._widget = None
+        if settings is None:
+            settings = {}
+        self._settings = settings
+
+        pos = self._settings.get('pos')
+        if pos:
+            self.move(pos)
+
+    def closeEvent(self, event):
+        self._settings['pos'] = self.pos()
+        event.accept()
+
+    def customEvent(self, event):
+        event.callback()
+        event.accept()
+
+
 class Application(QtGui.QApplication):
 
-    def __init__(self, argv, m=None):
-        super(Application, self).__init__(argv)
+    def __init__(self, window, m=None):
+        super(Application, self).__init__(sys.argv)
+
+        self.window = window
 
         self._set_basedir()
 
         if m:
             m._translate(self)
 
-        self.worker = Worker(self, m)
+        self.worker = Worker(window, m)
 
         if getattr(sys, 'frozen', False):
             # we are running in a PyInstaller bundle
@@ -84,6 +109,12 @@ class Application(QtGui.QApplication):
         else:
             # we are running in a normal Python environment
             self.basedir = os.path.dirname(__file__)
+
+        QtCore.QTimer.singleShot(0, self._start)
+
+    def _start(self):
+        self.window.show()
+        self.window.raise_()
 
     def exec_(self):
         status = super(self, Application).exec_()
