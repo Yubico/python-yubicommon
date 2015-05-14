@@ -28,11 +28,25 @@
 from setuptools import Command
 from distutils.errors import DistutilsSetupError
 from setuptools.command.sdist import sdist
+from PySide import QtGui
+from . import utils, classes
 import os
+import sys
 
 
 __dependencies__ = ['PySide']
-__all__ = ['qt_sdist', 'qt_resources']
+__all__ = ['qt_sdist', 'qt_resources'] + classes.__all__ + utils.__all__
+
+
+# Font fixes for OSX
+if sys.platform == 'darwin':
+    from platform import mac_ver
+    mac_version = tuple(mac_ver()[0].split('.'))
+    if (10, 9) <= mac_version < (10, 10):  # Mavericks
+        QtGui.QFont.insertSubstitution('.Lucida Grande UI', 'Lucida Grande')
+    if (10, 10) <= mac_version:  # Yosemite
+        QtGui.QFont.insertSubstitution('.Helvetica Neue DeskInterface',
+                                        'Helvetica Neue')
 
 
 class qt_sdist(sdist):
@@ -76,6 +90,7 @@ class _qt_resources(Command):
         os.unlink(qrc)
 
         self.announce("QT resources compiled into %s" % self.target)
+
 
 def qt_resources(target, sourcedir='qt_resources'):
     target = target.replace('.', os.path.sep)
