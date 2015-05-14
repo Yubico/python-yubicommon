@@ -91,17 +91,17 @@ class MainWindow(QtGui.QMainWindow):
 
 class Application(QtGui.QApplication):
 
-    def __init__(self, window, m=None):
+    def __init__(self, window_cls, m=None):
         super(Application, self).__init__(sys.argv)
 
-        self.window = window
+        self.window = window_cls()
 
         self._set_basedir()
 
         if m:
             m._translate(self)
 
-        self.worker = Worker(window, m)
+        self.worker = Worker(self.window, m)
 
         if getattr(sys, 'frozen', False):
             # we are running in a PyInstaller bundle
