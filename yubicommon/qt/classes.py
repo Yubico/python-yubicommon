@@ -96,8 +96,6 @@ class Application(QtGui.QApplication):
 
         self.window = window_cls()
 
-        self._set_basedir()
-
         if m:
             m._translate(self)
 
