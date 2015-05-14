@@ -27,7 +27,6 @@
 
 from setuptools import setup, find_packages
 from yubicommon import get_version, release
-from yubicommon.qt import qt_resources, qt_sdist
 
 setup(
     name='yubicommon',
@@ -44,8 +43,7 @@ setup(
     install_requires=[],
     test_suite='nose.collector',
     tests_require=[''],
-    cmdclass={'release': release, 'sdist': qt_sdist,
-              'qt_resources': qt_resources('yubicommon')},
+    cmdclass={'release': release},
     classifiers=[
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
