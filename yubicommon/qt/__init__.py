@@ -30,6 +30,8 @@ from distutils.errors import DistutilsSetupError
 from setuptools.command.sdist import sdist
 from PySide import QtGui
 from . import utils, classes
+from .utils import *
+from .classes import *
 import os
 import sys
 

@@ -55,15 +55,13 @@ def get_version(module_name=None):
 
 def get_dependencies(module):
     basedir = os.path.dirname(__file__)
-    files = [os.path.join(basedir, module, '__init__.py'),
-             os.path.join(basedir, module + '.py')]
-    for fn in files:
-        if os.path.isfile(fn):
-            with open(fn, 'r') as f:
-                match = DEPENDENCY_PATTERN.search(f.read())
-                if match:
-                    return map(lambda s: s.strip().strip('"\''),
-                               match.group(1).split(','))
+    fn = os.path.join(basedir, module, '__init__.py')
+    if os.path.isfile(fn):
+        with open(fn, 'r') as f:
+            match = DEPENDENCY_PATTERN.search(f.read())
+            if match:
+                return map(lambda s: s.strip().strip('"\''),
+                           match.group(1).split(','))
     return []
 
 
