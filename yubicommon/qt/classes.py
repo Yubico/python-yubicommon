@@ -30,7 +30,7 @@ import os
 import sys
 import time
 
-__all__ = ['Dialog', 'Application']
+__all__ = ['Application', 'MainWindow', 'Dialog']
 
 TOP_SECTION = '<b>%s</b>'
 SECTION = '<br><b>%s</b>'
