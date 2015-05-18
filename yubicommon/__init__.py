@@ -27,10 +27,10 @@
 
 __version__ = '0.0.1'
 __dependencies__ = []
-__all__ = ['get_version', 'dependencies', 'release']
+__all__ = ['get_version', 'setup', 'release']
 
 
-from setuptools import find_packages, Command
+from setuptools import setup as _setup, find_packages, Command
 from distutils import log
 from distutils.errors import DistutilsSetupError
 from datetime import date
@@ -46,7 +46,8 @@ def get_version(module_name=None):
     """Return the current version as defined by the given module."""
 
     if module_name is None:
-        module_name = find_packages()[0]
+        parts = __name__.split('.')
+        module_name = parts[0] if len(parts) > 1 else find_packages()[0]
 
     with open('%s/__init__.py' % module_name, 'r') as f:
         match = VERSION_PATTERN.search(f.read())
@@ -65,9 +66,24 @@ def get_dependencies(module):
     return []
 
 
-def dependencies(*modules):
-    return list(set(__dependencies__ +
-                    [dep for m in modules for dep in get_dependencies(m)]))
+def get_package(module):
+    return __name__ + '.' + module
+
+
+def setup(**kwargs):
+    if 'version' not in kwargs:
+        kwargs['version'] = get_version()
+    packages = kwargs.setdefault('packages',
+                                 find_packages(exclude=[__name__ + '*']))
+    install_requires = kwargs.setdefault('install_requires', [])
+    for yc_module in kwargs.pop('yc_requires', []):
+        packages.append(get_package(yc_module))
+        for dep in get_dependencies(yc_module):
+            if dep not in install_requires:
+                install_requires.append(dep)
+    cmdclass = kwargs.setdefault('cmdclass', {})
+    cmdclass.setdefault('release', release)
+    return _setup(**kwargs)
 
 
 class release(Command):
