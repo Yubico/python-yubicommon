@@ -48,7 +48,7 @@ if sys.platform == 'darwin':
         QtGui.QFont.insertSubstitution('.Lucida Grande UI', 'Lucida Grande')
     if (10, 10) <= mac_version:  # Yosemite
         QtGui.QFont.insertSubstitution('.Helvetica Neue DeskInterface',
-                                        'Helvetica Neue')
+                                       'Helvetica Neue')
 
 
 class qt_sdist(sdist):
