@@ -97,7 +97,7 @@ class _qt_resources(Command):
 def qt_resources(target, sourcedir='qt_resources'):
     target = target.replace('.', os.path.sep)
     if os.path.isdir(target):
-        target = os.path.join(target, 'qt_resouces.py')
+        target = os.path.join(target, 'qt_resources.py')
     else:
         target += '.py'
 
