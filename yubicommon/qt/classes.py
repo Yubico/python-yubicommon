@@ -30,7 +30,7 @@ import os
 import sys
 import time
 
-__all__ = ['Application', 'MainWindow', 'Dialog']
+__all__ = ['Application', 'Dialog']
 
 TOP_SECTION = '<b>%s</b>'
 SECTION = '<br><b>%s</b>'
@@ -66,22 +66,21 @@ class _Headers(object):
         return QtGui.QLabel(section)
 
 
-class MainWindow(QtGui.QMainWindow):
+class _MainWindow(QtGui.QMainWindow):
+    shown = QtCore.Signal()
+    closed = QtCore.Signal()
 
-    def __init__(self, settings=None):
-        super(MainWindow, self).__init__()
+    def __init__(self):
+        super(_MainWindow, self).__init__()
 
         self._widget = None
-        if settings is None:
-            settings = {}
-        self._settings = settings
-
-        pos = self._settings.get('pos')
-        if pos:
-            self.move(pos)
 
     def closeEvent(self, event):
-        self._settings['pos'] = self.pos()
+        self.closed.emit()
+        event.accept()
+
+    def showEvent(self, event):
+        self.shown.emit()
         event.accept()
 
     def customEvent(self, event):
@@ -91,10 +90,10 @@ class MainWindow(QtGui.QMainWindow):
 
 class Application(QtGui.QApplication):
 
-    def __init__(self, window_cls, m=None):
+    def __init__(self, m=None):
         super(Application, self).__init__(sys.argv)
 
-        self.window = window_cls()
+        self.window = _MainWindow()
 
         if m:
             m._translate(self)
@@ -107,12 +106,6 @@ class Application(QtGui.QApplication):
         else:
             # we are running in a normal Python environment
             self.basedir = os.path.dirname(__file__)
-
-        QtCore.QTimer.singleShot(0, self._start)
-
-    def _start(self):
-        self.window.show()
-        self.window.raise_()
 
     def exec_(self):
         status = super(Application, self).exec_()
