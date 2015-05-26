@@ -81,6 +81,12 @@ class Worker(QtCore.QObject):
             fn = partial(fn[0], *fn[1:])
         self._work_signal.emit((fn, callback, return_errors))
 
+    def post_fg(self, fn):
+        if isinstance(fn, tuple):
+            fn = partial(fn[0], *fn[1:])
+        event = _Event(fn)
+        QtGui.QApplication.postEvent(self.window, event)
+
     @QtCore.Slot(tuple)
     def work(self, job):
         QtCore.QThread.msleep(10)  # Needed to yield
