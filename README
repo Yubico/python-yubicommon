@@ -23,7 +23,7 @@ create a symlink in the parent module. For example:
       ├── __init__.py
       └── yubicommon -> ../vendor/yubicommon/yubicommon
 
-When vendoring YubiCommon as a submodule you should use the read-only URL to
+When vendoring YubiCommon as a submodule you should use the HTTPS URL to
 ensure that anyone can initialize the repository:
 
   git submodule add https://github.com/Yubico/python-yubicommon.git vendor/yubicommon
