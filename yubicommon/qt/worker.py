@@ -26,11 +26,11 @@
 
 from PySide import QtGui, QtCore
 from functools import partial
-from .utils import get_active_window
+from .utils import get_active_window, default_messages
 import traceback
 
 
-class _DefaultMessages(object):
+class _Messages(object):
     wait = 'Please wait...'
 
 
@@ -50,7 +50,8 @@ class Worker(QtCore.QObject):
     _work_signal = QtCore.Signal(tuple)
     _work_done_0 = QtCore.Signal()
 
-    def __init__(self, window, m=_DefaultMessages()):
+    @default_messages(_Messages)
+    def __init__(self, window, m):
         super(Worker, self).__init__()
 
         self.window = window

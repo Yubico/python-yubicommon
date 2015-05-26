@@ -29,15 +29,16 @@ from setuptools import Command
 from distutils.errors import DistutilsSetupError
 from setuptools.command.sdist import sdist
 from PySide import QtGui
-from . import utils, classes
 from .utils import *
 from .classes import *
+from .worker import *
+from .settings import *
 import os
 import sys
 
 
 __dependencies__ = ['PySide']
-__all__ = ['qt_sdist', 'qt_resources'] + classes.__all__ + utils.__all__
+__all__ = ['qt_sdist', 'qt_resources']
 
 
 # Font fixes for OSX

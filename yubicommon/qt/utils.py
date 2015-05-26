@@ -25,8 +25,38 @@
 # for the parts of OpenSSL used as well as that of the covered work.
 
 from PySide import QtCore, QtGui
+from functools import wraps
+from inspect import getargspec
 
 __all__ = ['get_text', 'get_active_window']
+
+
+class _DefaultMessages(object):
+
+    def __init__(self, default_m, m=None):
+        self._defaults = default_m
+        self._m = m
+
+    def __getattr__(self, method_name):
+        print "delegating"
+        if hasattr(self._m, method_name):
+            return getattr(self._m, method_name)
+        else:
+            return getattr(self._defaults, method_name)
+
+def default_messages(_m, name='m'):
+    def inner(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            index = getargspec(fn).args.index(name)
+            if len(args) > index:
+                args = list(args)
+                args[index] = _DefaultMessages(_m, args[index])
+            else:
+                kwargs[name] = _DefaultMessages(_m, kwargs.get(name))
+            return fn(*args, **kwargs)
+        return wrapper
+    return inner
 
 
 def get_text(*args, **kwargs):
