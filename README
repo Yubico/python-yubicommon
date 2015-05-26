@@ -23,5 +23,12 @@ create a symlink in the parent module. For example:
       ├── __init__.py
       └── yubicommon -> ../vendor/yubicommon/yubicommon
 
+When vendoring YubiCommon as a submodule you should use the read-only URL to
+ensure that anyone can initialize the repository:
+
+  git submodule add https://github.com/Yubico/python-yubicommon.git vendor/yubicommon
+  git submodule init
+  git submodule update
+
 === Using YubiCommon as a dependency
 You can depend on YubiCommon like any other Python dependency, by specifying it in your setup.py file. You should take care to depend on a specific version of YubiCommon to ensure that new versions to not break your project.
