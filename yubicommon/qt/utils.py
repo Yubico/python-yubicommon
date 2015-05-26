@@ -38,7 +38,6 @@ class _DefaultMessages(object):
         self._m = m
 
     def __getattr__(self, method_name):
-        print "delegating"
         if hasattr(self._m, method_name):
             return getattr(self._m, method_name)
         else:
