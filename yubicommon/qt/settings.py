@@ -79,12 +79,14 @@ class Settings(QtCore.QObject):
     def __init__(self, q_settings, wrap=True):
         super(Settings, self).__init__()
         self._mutex = QtCore.QMutex(QtCore.QMutex.Recursive)
-        if wrap and not isinstance(q_settings, PySettings):
-            q_settings = PySettings(q_settings)
+        self._wrap = wrap
         self._q_settings = q_settings
 
     def get_group(self, group):
-        return SettingsGroup(self._q_settings, self._mutex, group)
+        g = SettingsGroup(self._q_settings, self._mutex, group)
+        if self._wrap:
+            g = PySettings(g)
+        return g
 
     @staticmethod
     def wrap(*args, **kwargs):
