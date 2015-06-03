@@ -34,7 +34,7 @@ def convert_to(value, target_type):
     if target_type is list:
         return [] if value is None else [value]
     if target_type is int:
-        return int(value)
+        return 0 if value in ['', 'false', 'False'] else int(value)
     if target_type is float:
         return float(value)
     if target_type is bool:
