@@ -35,6 +35,7 @@ from .worker import *
 from .settings import *
 import os
 import sys
+import traceback
 
 
 __dependencies__ = ['PySide']
@@ -50,6 +51,16 @@ if sys.platform == 'darwin':
     if (10, 10) <= mac_version:  # Yosemite
         QtGui.QFont.insertSubstitution('.Helvetica Neue DeskInterface',
                                        'Helvetica Neue')
+
+# Replace excepthook with one that releases the exception to prevent memory
+# leaks:
+def excepthook(typ, val, tback):
+    traceback.print_exception(typ, val, tback)
+    sys.exc_clear()
+    del sys.last_value
+    del sys.last_traceback
+    del sys.last_type
+sys.excepthook = excepthook
 
 
 class qt_sdist(sdist):
