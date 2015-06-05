@@ -79,3 +79,10 @@ def get_active_window():
         return QtCore.QCoreApplication.instance().window
 
     return wins[0]  # TODO: If more than one candidates remain, find best one.
+
+
+def connect_once(signal, slot):
+    def wrapped(*args, **kwargs):
+        signal.disconnect(wrapped)
+        slot(*args, **kwargs)
+    signal.connect(wrapped)
