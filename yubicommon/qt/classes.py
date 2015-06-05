@@ -67,21 +67,11 @@ class _Headers(object):
 
 
 class _MainWindow(QtGui.QMainWindow):
-    shown = QtCore.Signal()
-    closed = QtCore.Signal()
 
     def __init__(self):
         super(_MainWindow, self).__init__()
 
         self._widget = None
-
-    def closeEvent(self, event):
-        self.closed.emit()
-        event.accept()
-
-    def showEvent(self, event):
-        self.shown.emit()
-        event.accept()
 
     def customEvent(self, event):
         event.callback()
