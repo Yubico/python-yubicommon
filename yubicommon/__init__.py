@@ -35,7 +35,10 @@ from distutils import log
 from distutils.errors import DistutilsSetupError
 from datetime import date
 import os
+import sys
 import re
+import json
+import tempfile
 
 VERSION_PATTERN = re.compile(r"(?m)^__version__\s*=\s*['\"](.+)['\"]$")
 DEPENDENCY_PATTERN = re.compile(
@@ -74,7 +77,7 @@ def setup(**kwargs):
     if 'version' not in kwargs:
         kwargs['version'] = get_version()
     packages = kwargs.setdefault('packages',
-                                 find_packages(exclude=[__name__ + '*']))
+                                 find_packages(exclude=[__name__ + '.*']))
     install_requires = kwargs.setdefault('install_requires', [])
     for yc_module in kwargs.pop('yc_requires', []):
         packages.append(get_package(yc_module))
@@ -83,6 +86,7 @@ def setup(**kwargs):
                 install_requires.append(dep)
     cmdclass = kwargs.setdefault('cmdclass', {})
     cmdclass.setdefault('release', release)
+    cmdclass.setdefault('executable', executable)
     return _setup(**kwargs)
 
 
@@ -174,3 +178,44 @@ class release(Command):
         self.announce("")
         self.announce("    git push && git push --tags", log.INFO)
         self.announce("")
+
+
+class executable(Command):
+    description = "create an executable"
+    user_options = [
+        ('debug', None, "build with debug flag"),
+    ]
+    boolean_options = ['debug']
+
+    def initialize_options(self):
+        self.debug = 0
+
+    def finalize_options(self):
+        self.cwd = os.getcwd()
+
+    def run(self):
+        if os.getcwd() != self.cwd:
+            raise DistutilsSetupError("Must be in package root!")
+
+        os.environ['pyinstaller_data'] = json.dumps({
+            'debug': self.debug,
+            'version': self.distribution.get_version(),
+            'name': self.distribution.get_name(),
+            'fullname': getattr(self.distribution, 'fullname',
+                                self.distribution.get_name()),
+            'ver_name': self.distribution.get_fullname(),
+            'scripts': self.distribution.scripts
+        })
+
+        from PyInstaller.main import run as pyinst_run
+
+        spec = tempfile.NamedTemporaryFile(suffix='.spec', delete=False)
+        source = os.path.join(os.path.dirname(__file__), 'pyinstaller_spec.py')
+        with open(source) as f:
+            spec.write(f.read())
+        spec_name = spec.name
+        spec.close()
+        pyinst_run([spec_name])
+        os.unlink(spec_name)
+
+        self.announce("Executable created!")
