@@ -134,7 +134,7 @@ if OSX:
                  version=ver_str,
                  icon=ICON)
 
-    with open('dist/%s.app/Contents/Resources/' % NAME) as f:
+    with open('dist/%s.app/Contents/Resources/qt.conf' % NAME) as f:
         f.write('[Path]\nPlugins = plugins')
 
 # Create Windows installer
