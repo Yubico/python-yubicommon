@@ -4,6 +4,7 @@
 import os
 import sys
 import json
+import errno
 from glob import glob
 
 VS_VERSION_INFO = """
@@ -134,7 +135,14 @@ if OSX:
                  version=ver_str,
                  icon=ICON)
 
-    with open('dist/%s.app/Contents/Resources/qt.conf' % NAME) as f:
+    qt_conf = 'dist/%s.app/Contents/Resources/qt.conf' % NAME
+    qt_conf_dir = os.path.dirname(qt_conf)
+    try:
+        os.makedirs(qt_conf_dir)
+    except OSError as e:
+        if e.errno != errno.EEXIST or os.path.isdir(qt_conf_dir):
+            raise
+    with open(qt_conf, 'w') as f:
         f.write('[Path]\nPlugins = plugins')
 
 # Create Windows installer
