@@ -58,11 +58,14 @@ NAME = data['fullname']
 WIN = sys.platform in ['win32', 'cygwin']
 OSX = sys.platform in ['darwin']
 
-ICON = os.path.join('resources', '%s.png' % data['name'])
 if WIN:
-    ICON = os.path.join('resources', '%s.ico' % data['name'])
+    icon_ext = 'ico'
 elif OSX:
-    ICON = os.path.join('resources', '%s.icns' % data['name'])
+    icon_ext = 'icns'
+else:
+    icon_ext = 'png'
+ICON = os.path.join('resources', '%s.%s' % (data['name'], icon_ext))
+
 if not os.path.isfile(ICON):
     ICON = None
 
