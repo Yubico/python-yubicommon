@@ -143,7 +143,7 @@ if OSX:
     try:
         os.makedirs(qt_conf_dir)
     except OSError as e:
-        if e.errno != errno.EEXIST or os.path.isdir(qt_conf_dir):
+        if not (e.errno == errno.EEXIST and os.path.isdir(qt_conf_dir)):
             raise
     with open(qt_conf, 'w') as f:
         f.write('[Path]\nPlugins = plugins')
