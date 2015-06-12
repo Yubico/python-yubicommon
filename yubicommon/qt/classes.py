@@ -97,6 +97,28 @@ class Application(QtGui.QApplication):
             # we are running in a normal Python environment
             self.basedir = os.path.dirname(__file__)
 
+    def ensure_singleton(self, name=None):
+        if not name:
+            name = self.applicationName()
+        from PySide import QtNetwork
+        self._l_socket = QtNetwork.QLocalSocket()
+        self._l_socket.connectToServer(name, QtCore.QIODevice.WriteOnly)
+        if self._l_socket.waitForConnected():
+            self.worker.thread().quit()
+            self.deleteLater()
+            time.sleep(0.01)  # Without this the process sometimes stalls.
+            sys.exit(0)
+        else:
+            self._l_server = QtNetwork.QLocalServer()
+            if not self._l_server.listen(name):
+                QtNetwork.QLocalServer.removeServer(name)
+                self._l_server.listen(name)
+            self._l_server.newConnection.connect(self._show_window)
+
+    def _show_window(self):
+        self.window.show()
+        self.window.activateWindow()
+
     def exec_(self):
         status = super(Application, self).exec_()
         self.worker.thread().quit()
