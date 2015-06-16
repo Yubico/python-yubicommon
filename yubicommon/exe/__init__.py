@@ -27,7 +27,6 @@
 
 from setuptools import Command
 from distutils.errors import DistutilsSetupError
-from PyInstaller.main import run as pyinst_run
 import os
 import json
 import tempfile
@@ -49,6 +48,8 @@ class executable(Command):
     def run(self):
         if os.getcwd() != self.cwd:
             raise DistutilsSetupError("Must be in package root!")
+
+        from PyInstaller.main import run as pyinst_run
 
         os.environ['pyinstaller_data'] = json.dumps({
             'debug': self.debug,
