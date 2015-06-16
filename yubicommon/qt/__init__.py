@@ -25,21 +25,13 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from setuptools import Command
-from distutils.errors import DistutilsSetupError
-from setuptools.command.sdist import sdist
 from PySide import QtGui
 from .utils import *
 from .classes import *
 from .worker import *
 from .settings import *
-import os
 import sys
 import traceback
-
-
-__dependencies__ = ['PySide']
-__all__ = ['qt_sdist', 'qt_resources']
 
 
 # Font fixes for OSX
@@ -52,6 +44,7 @@ if sys.platform == 'darwin':
         QtGui.QFont.insertSubstitution('.Helvetica Neue DeskInterface',
                                        'Helvetica Neue')
 
+
 # Replace excepthook with one that releases the exception to prevent memory
 # leaks:
 def excepthook(typ, val, tback):
@@ -61,59 +54,3 @@ def excepthook(typ, val, tback):
     del sys.last_traceback
     del sys.last_type
 sys.excepthook = excepthook
-
-
-class qt_sdist(sdist):
-    def run(self):
-        self.run_command('qt_resources')
-
-        sdist.run(self)
-
-
-class _qt_resources(Command):
-    description = "convert file resources into code"
-    user_options = []
-    boolean_options = []
-    _source = 'qt_resources'
-    _target = ''
-
-    def initialize_options(self):
-        pass
-
-    def finalize_options(self):
-        self.cwd = os.getcwd()
-        self.source = os.path.join(self.cwd, self._source)
-        self.target = os.path.join(self.cwd, self._target)
-
-    def _create_qrc(self):
-        qrc = os.path.join(self.source, 'qt_resources.qrc')
-        with open(qrc, 'w') as f:
-            f.write('<RCC>\n<qresource>\n')
-            for fname in os.listdir(self.source):
-                f.write('<file>%s</file>\n' % fname)
-            f.write('</qresource>\n</RCC>\n')
-        return qrc
-
-    def run(self):
-        if os.getcwd() != self.cwd:
-            raise DistutilsSetupError("Must be in package root!")
-
-        qrc = self._create_qrc()
-        self.execute(os.system,
-                     ('pyside-rcc "%s" -o "%s"' % (qrc, self.target),))
-        os.unlink(qrc)
-
-        self.announce("QT resources compiled into %s" % self.target)
-
-
-def qt_resources(target, sourcedir='qt_resources'):
-    target = target.replace('.', os.path.sep)
-    if os.path.isdir(target):
-        target = os.path.join(target, 'qt_resources.py')
-    else:
-        target += '.py'
-
-    return type('qt_resources', (_qt_resources, object), {
-        '_source': sourcedir,
-        '_target': target
-    })
