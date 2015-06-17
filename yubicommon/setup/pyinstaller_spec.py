@@ -58,6 +58,8 @@ NAME = data['fullname']
 WIN = sys.platform in ['win32', 'cygwin']
 OSX = sys.platform in ['darwin']
 
+file_ext = '.exe' if WIN else ''
+
 if WIN:
     icon_ext = 'ico'
 elif OSX:
@@ -69,16 +71,19 @@ ICON = os.path.join('resources', '%s.%s' % (data['name'], icon_ext))
 if not os.path.isfile(ICON):
     ICON = None
 
-a = Analysis(map(lambda x: x.encode('ascii'), data['scripts']),
-             pathex=[''],
-             hiddenimports=[],
-             hookspath=None,
-             runtime_hooks=None)
+merge = []
+for script in [s.encode('ascii') for s in data['scripts']]:
+    a_name = script.rsplit('/', 1)[-1]
+    a = Analysis(
+        [script],
+        pathex=[''],
+        hiddenimports=[],
+        hookspath=None,
+        runtime_hooks=None
+    )
+    merge.append((a, a_name, a_name + file_ext))
 
-# DLLs, dylibs and executables should go here.
-libs = glob('lib/*')
-for filename in libs:
-    a.datas.append((filename[4:], filename, 'BINARY'))
+MERGE(*merge)
 
 # Read version string
 ver_str = data['version']
@@ -102,34 +107,40 @@ if WIN:
             'internal_name': data['name'],
             'ver_tup': ver_tup,
             'ver_str': ver_str,
-            'exe_name': '%s.exe' % NAME
+            'exe_name': NAME + file_ext
         })
 
-pyz = PYZ(a.pure)
-exe = EXE(pyz,
-          a.scripts,
-          exclude_binaries=True,
-          name=NAME if not WIN else '%s.exe' % NAME,
-          debug=DEBUG,
-          strip=None,
-          upx=True,
-          console=DEBUG,
-          append_pkg=not OSX,
-          version=VERSION,
-          icon=ICON)
+pyzs = map(lambda m: PYZ(m[0].pure), merge)
 
-# Sign the executable
-if WIN:
+exes = []
+for (a, _, a_name), pyz in zip(merge, pyzs):
+    exe = EXE(pyz,
+              a.scripts,
+              exclude_binaries=True,
+              name=a_name,
+              debug=DEBUG,
+              strip=None,
+              upx=True,
+              # All but the first executable become console scripts.
+              console=DEBUG or len(exes) > 0,
+              append_pkg=not OSX,
+              version=VERSION,
+              icon=ICON)
+    exes.append(exe)
+
+    # Sign the executable
+    if WIN:
         os.system("signtool.exe sign /t http://timestamp.verisign.com/scripts/timstamp.dll \"%s\"" %
-                  (exe.name))
+                (exe.name))
 
-coll = COLLECT(exe,
-               a.binaries,
-               a.zipfiles,
-               a.datas,
-               strip=None,
-               upx=True,
-               name=NAME)
+collect = []
+for (a, _, a_name), exe in zip(merge, exes):
+    collect += [exe, a.binaries, a.zipfiles, a.datas]
+
+# DLLs, dylibs and executables should go here.
+collect.append([(fn[4:], fn, 'BINARY') for fn in glob('lib/*')])
+
+coll = COLLECT(*collect, strip=None, upx=True, name=NAME)
 
 # Create .app for OSX
 if OSX:
