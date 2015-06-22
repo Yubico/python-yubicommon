@@ -39,7 +39,7 @@ def convert_to(value, target_type):
         return float(value)
     if target_type is bool:
         return value not in ['', 'false', 'False']
-    return value
+    return value.encode('utf8')
 
 
 class SettingsGroup(object):
