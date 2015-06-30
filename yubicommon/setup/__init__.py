@@ -122,15 +122,10 @@ class build_man(Command):
         if os.getcwd() != self.cwd:
             raise DistutilsSetupError("Must be in package root!")
 
-        dirs = set([os.path.dirname(s) for s in
-                    self.distribution.scripts or []])
-
-        for d in dirs:
-            for fname in glob(os.path.join(d, '*.adoc')):
-                self.announce("Converting: " + fname, log.INFO)
-                self.execute(os.system,
-                             ('a2x --doctype manpage --format manpage %s'
-                              % fname,))
+        for fname in glob(os.path.join('man', '*.adoc')):
+            self.announce("Converting: " + fname, log.INFO)
+            self.execute(os.system,
+                         ('a2x -d manpage -f manpage "%s"' % fname,))
 
 
 class release(Command):
