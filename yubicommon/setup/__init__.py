@@ -31,9 +31,11 @@ __all__ = ['get_version', 'setup', 'release']
 
 
 from setuptools import setup as _setup, find_packages, Command
+from setuptools.command.sdist import sdist
 from distutils import log
-from distutils.errors import DistutilsSetupError
+from distutils.errors import DistutilsSetupError, DistutilsModuleError
 from datetime import date
+from glob import glob
 import os
 import re
 
@@ -86,7 +88,48 @@ def setup(**kwargs):
                 install_requires.append(dep)
     cmdclass = kwargs.setdefault('cmdclass', {})
     cmdclass.setdefault('release', release)
+    cmdclass.setdefault('build_man', build_man)
+    cmdclass.setdefault('sdist', custom_sdist)
     return _setup(**kwargs)
+
+
+class custom_sdist(sdist):
+    def run(self):
+        self.run_command('build_man')
+        try:
+            self.run_command('qt_resources')
+        except DistutilsModuleError:
+            pass
+
+        sdist.run(self)
+
+
+class build_man(Command):
+    description = "create man pages from asciidoc source"
+    user_options = []
+    boolean_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        self.cwd = os.getcwd()
+        self.fullname = self.distribution.get_fullname()
+        self.name = self.distribution.get_name()
+        self.version = self.distribution.get_version()
+
+    def run(self):
+        if os.getcwd() != self.cwd:
+            raise DistutilsSetupError("Must be in package root!")
+
+        dirs = set([os.path.dirname(s) for s in self.distribution.scripts])
+
+        for d in dirs:
+            for fname in glob(os.path.join(d, '*.adoc')):
+                self.announce("Converting: " + fname, log.INFO)
+                self.execute(os.system,
+                             ('a2x --doctype manpage --format manpage %s'
+                              % fname,))
 
 
 class release(Command):

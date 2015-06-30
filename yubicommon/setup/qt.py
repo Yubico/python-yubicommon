@@ -27,19 +27,11 @@
 
 from setuptools import Command
 from distutils.errors import DistutilsSetupError
-from setuptools.command.sdist import sdist
 import os
 
 
 __dependencies__ = ['PySide']
-__all__ = ['qt_sdist', 'qt_resources']
-
-
-class qt_sdist(sdist):
-    def run(self):
-        self.run_command('qt_resources')
-
-        sdist.run(self)
+__all__ = ['qt_resources']
 
 
 class _qt_resources(Command):
