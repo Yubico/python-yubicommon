@@ -96,10 +96,10 @@ def setup(**kwargs):
 class custom_sdist(sdist):
     def run(self):
         self.run_command('build_man')
-        try:
+
+        # Run if available:
+        if 'qt_resources' in self.distribution.cmdclass:
             self.run_command('qt_resources')
-        except DistutilsModuleError:
-            pass
 
         sdist.run(self)
 
@@ -122,7 +122,8 @@ class build_man(Command):
         if os.getcwd() != self.cwd:
             raise DistutilsSetupError("Must be in package root!")
 
-        dirs = set([os.path.dirname(s) for s in self.distribution.scripts])
+        dirs = set([os.path.dirname(s) for s in
+                    self.distribution.scripts or []])
 
         for d in dirs:
             for fname in glob(os.path.join(d, '*.adoc')):
