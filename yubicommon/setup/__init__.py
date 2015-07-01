@@ -162,7 +162,7 @@ class release(Command):
                 "Tag '%s' already exists!" % self.fullname)
 
     def _verify_not_dirty(self):
-        if os.system('git diff --shortstat | grep -q "."'):
+        if os.system('git diff --shortstat | grep -q "."') == 0:
             raise DistutilsSetupError("Git has uncommitted changes!")
 
     def _sign(self):
