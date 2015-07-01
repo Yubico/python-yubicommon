@@ -161,6 +161,10 @@ class release(Command):
             raise DistutilsSetupError(
                 "Tag '%s' already exists!" % self.fullname)
 
+    def _verify_not_dirty(self):
+        if os.system('git diff --shortstat | grep -q "."'):
+            raise DistutilsSetupError("Git has uncommitted changes!")
+
     def _sign(self):
         if os.path.isfile('dist/%s.tar.gz.asc' % self.fullname):
             # Signature exists from upload, re-use it:
@@ -188,6 +192,7 @@ class release(Command):
 
         self._verify_version()
         self._verify_tag()
+        self._verify_not_dirty()
         self.run_command('check')
 
         self.execute(os.system, ('git2cl > ChangeLog',))
