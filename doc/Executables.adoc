@@ -1,0 +1,32 @@
+== Executables
+Yubicommons supports building stand alone executables using PyInstaller, for
+distribution on Windows and OS X. Executables are build for any entry_points
+defined in your projects setup.py.
+
+To create the binaries, run the following command:
+
+ $ python setup.py executable
+
+To make the command available, you must include it in your projects setup.py:
+
+    from yubicommon.setup.exe import executable
+
+    setup(
+        ....
+    )
+
+=== Example setup.py snippet
+
+    entry_points={
+        'gui_scripts': ['yubioath=yubioath.gui.__main__:main'],
+        'console_scripts': ['yubioath-cli=yubioath.cli.__main__:main']
+    },
+
+NOTE: Only entries in *console_scripts* will have their output shown in a
+terminal.
+
+== Including files
+Often you will need to include additional files such as DLLs in your
+installation directory. This can be done by creating a *lib/* directory in the
+root of the project and adding any files there. These files will simply be
+copied to the root of the output directory.

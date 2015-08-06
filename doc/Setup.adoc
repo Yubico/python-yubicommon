@@ -1,0 +1,60 @@
+== Setup
+Your project should have a setup.py file in its root where it defines it's
+properties, dependencies, etc. Instead of importing the *setup* function from
+setuptools, yubicommon provides its own version which you should use instead.
+
+=== Example
+from yubicommon.setup import setup
+
+setup(
+  ...
+)
+
+== Features
+The setup function from yubicommon works as a drop-in replacement for the
+regular setup function, but adds some additional features.
+
+=== Automatic version detection
+By not specifying a version, setup will automatically determine the version of
+your project by looking for a __version__ variable in the __init__.py file of
+your main package.
+
+=== Automatic package detection
+By not specifying your packages, they will be automatically detected and added.
+If you need to specify packages manually, you should use the find_packages
+function from yubicommon, as it will manage yubicommon packages for you.
+
+=== Man page generation from AsciiDoc
+When creating a source distribution man pages will be generated for any files
+matching the following pattern:
+
+  man/filename.1.adoc
+
+The resulting man pages will have the same name without the .adoc extension.
+One such file for each executable should be created.
+
+=== Release command
+A new release command is added, which is used to create source releases of your
+project. The command will take care of building the source distribution,
+signing it, creating a git tag, and optionally uploading the release to PyPI.
+Running the command:
+
+  $ python setup.py release [--pypi] [--skip-tests] [--key-id GPG_KEY_ID]
+
+=== Yubicommon requirements
+Yubicommon provides several packages with utility functionality that you can
+use in your project. To avoid adding extra functionality that you are not
+interested in you need to specify which parts of Yubicommon that you wish to
+use. This is done by adding the yc_requires parameter to your setup call. The
+value of this parameter is a list of subpackages you wish to be available in
+your project. For example:
+
+    setup(
+        ....
+        yc_requires=['ctypes', 'qt'],
+        ....
+    )
+
+The above example will let you access the yubicommon.ctypes and yubicommon.qt
+packages in your project, as well as take care of adding any additional
+dependencies to your project that are needed by these (such as PySide).
