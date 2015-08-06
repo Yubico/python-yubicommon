@@ -99,7 +99,13 @@ VERSION = None
 if WIN:
     VERSION = 'build/file_version_info.txt'
 
-    ver_tup = tuple(map(int, ver_str.split('.')))
+    def int_or_zero(v):
+        try:
+            return int(v)
+        except ValueError:
+            return 0
+
+    ver_tup = tuple(map(int_or_zero, ver_str.split('.')))
     # Windows needs 4-tuple.
     if len(ver_tup) < 4:
         ver_tup += (0,) * (4-len(ver_tup))
