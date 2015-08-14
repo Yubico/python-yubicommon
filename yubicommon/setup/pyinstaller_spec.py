@@ -92,7 +92,7 @@ entry_map = dist.get_entry_map()
 console_scripts = entry_map.get('console_scripts', {})
 gui_scripts = entry_map.get('gui_scripts', {})
 
-for ep in console_scripts.values() + gui_scripts.values():
+for ep in list(console_scripts.values()) + list(gui_scripts.values()):
     script_path = os.path.join(WORKPATH, ep.name + '-script.py')
     with open(script_path, 'w') as fh:
         fh.write("import %s\n" % ep.module_name)

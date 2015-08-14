@@ -119,7 +119,7 @@ class PySettings(MutableMapping):
         self._settings.remove(key)
 
     def __iter__(self):
-        for key in self.keys():
+        for key in list(self.keys()):
             yield key
 
     def __len__(self):
@@ -132,7 +132,7 @@ class PySettings(MutableMapping):
         return self._settings.childKeys()
 
     def update(self, data):
-        for key, value in data.items():
+        for key, value in list(data.items()):
             self[key] = value
 
     def clear(self):
