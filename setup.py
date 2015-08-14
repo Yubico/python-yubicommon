@@ -26,7 +26,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from setuptools import setup, find_packages
-from yubicommon import get_version, release
+from yubicommon.setup import get_version, release
 
 setup(
     name='yubicommon',
