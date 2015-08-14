@@ -2,6 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 from __future__ import absolute_import
+from __future__ import print_function
 
 import os
 import sys
@@ -181,4 +182,4 @@ if WIN:
         installer = "dist/%s-%s-win.exe" % (data['name'], ver_str)
         os.system("signtool.exe sign /t http://timestamp.verisign.com/scripts/timstamp.dll \"%s\"" %
                  (installer))
-        print "Installer created: %s" % installer
+        print("Installer created: %s" % installer)
