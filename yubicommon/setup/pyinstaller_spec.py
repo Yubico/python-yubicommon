@@ -11,6 +11,14 @@ import errno
 import pkg_resources
 from glob import glob
 
+# Saves importing (and depending on) six
+try:
+    # Python 3
+    text_type = unicode
+except NameError:
+    # Python 2
+    text_type = str
+
 VS_VERSION_INFO = """
 VSVersionInfo(
   ffi=FixedFileInfo(
@@ -54,7 +62,8 @@ VSVersionInfo(
 )"""
 
 data = json.loads(os.environ['pyinstaller_data'])
-data = dict(map(lambda (k, v): (k, v.encode('ascii') if isinstance(v, unicode) else v), data.items()))
+data = dict((k, v.encode('ascii') if isinstance(v, text_type) else v)
+            for k, v in data.items())
 dist = pkg_resources.get_distribution(data['name'])
 ver_str = dist.version
 
@@ -108,7 +117,7 @@ if WIN:
         except ValueError:
             return 0
 
-    ver_tup = tuple(map(int_or_zero, ver_str.split('.')))
+    ver_tup = tuple(int_or_zero(v) for v in ver_str.split('.'))
     # Windows needs 4-tuple.
     if len(ver_tup) < 4:
         ver_tup += (0,) * (4-len(ver_tup))
@@ -125,7 +134,7 @@ if WIN:
             'exe_name': NAME + file_ext
         })
 
-pyzs = map(lambda m: PYZ(m[0].pure), merge)
+pyzs = [PYZ(m[0].pure) for m in merge]
 
 exes = []
 for (a, a_name, a_name_ext), pyz in zip(merge, pyzs):

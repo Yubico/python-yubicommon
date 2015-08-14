@@ -67,8 +67,8 @@ def get_dependencies(module):
         with open(fn, 'r') as f:
             match = DEPENDENCY_PATTERN.search(f.read())
             if match:
-                return map(lambda s: s.strip().strip('"\''),
-                           match.group(1).split(','))
+                return [s.strip().strip('"\'')
+                        for s in match.group(1).split(',')]
     return []
 
 
