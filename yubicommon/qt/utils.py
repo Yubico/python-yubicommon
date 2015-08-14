@@ -24,6 +24,8 @@
 # non-source form of such a combination shall include the source code
 # for the parts of OpenSSL used as well as that of the covered work.
 
+from __future__ import absolute_import
+
 from PySide import QtCore, QtGui
 from functools import wraps
 from inspect import getargspec
