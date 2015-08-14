@@ -25,6 +25,8 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import absolute_import
+
 
 __dependencies__ = []
 __all__ = ['get_version', 'setup', 'release']
@@ -65,8 +67,8 @@ def get_dependencies(module):
         with open(fn, 'r') as f:
             match = DEPENDENCY_PATTERN.search(f.read())
             if match:
-                return map(lambda s: s.strip().strip('"\''),
-                           match.group(1).split(','))
+                return [s.strip().strip('"\'')
+                        for s in match.group(1).split(',')]
     return []
 
 
