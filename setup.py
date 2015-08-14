@@ -39,10 +39,6 @@ setup(
     description='Python library of common utilities for Yubico applications.',
     license='BSD 2 clause',
     packages=find_packages(),
-    setup_requires=['nose>=1.0'],
-    install_requires=[],
-    test_suite='nose.collector',
-    tests_require=[''],
     cmdclass={'release': release},
     classifiers=[
         'License :: OSI Approved :: BSD License',
