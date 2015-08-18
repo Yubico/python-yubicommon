@@ -11,13 +11,6 @@ import errno
 import pkg_resources
 from glob import glob
 
-# Saves importing (and depending on) six
-try:
-    # Python 3
-    text_type = unicode
-except NameError:
-    # Python 2
-    text_type = str
 
 VS_VERSION_INFO = """
 VSVersionInfo(
@@ -62,8 +55,11 @@ VSVersionInfo(
 )"""
 
 data = json.loads(os.environ['pyinstaller_data'])
-data = dict((k, v.encode('ascii') if isinstance(v, text_type) else v)
-            for k, v in data.items())
+try:
+    data = dict((k, v.encode('ascii') if isinstance(v, unicode) else v)
+                for k, v in data.items())
+except NameError:
+    pass  # Python 3, encode not needed.
 dist = pkg_resources.get_distribution(data['name'])
 ver_str = dist.version
 
@@ -110,6 +106,8 @@ MERGE(*merge)
 VERSION = None
 if WIN:
     VERSION = 'build/file_version_info.txt'
+
+    global int_or_zero  # Needed due to how this script is invoked
 
     def int_or_zero(v):
         try:
