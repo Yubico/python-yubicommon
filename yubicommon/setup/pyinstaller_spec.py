@@ -88,7 +88,7 @@ entry_map = dist.get_entry_map()
 console_scripts = entry_map.get('console_scripts', {})
 gui_scripts = entry_map.get('gui_scripts', {})
 
-for ep in list(console_scripts.values()) + list(gui_scripts.values()):
+for ep in list(gui_scripts.values()) + list(console_scripts.values()):
     script_path = os.path.join(WORKPATH, ep.name + '-script.py')
     with open(script_path, 'w') as fh:
         fh.write("import %s\n" % ep.module_name)
@@ -143,7 +143,6 @@ for (a, a_name, a_name_ext), pyz in zip(merge, pyzs):
               debug=DEBUG,
               strip=None,
               upx=True,
-              # All but the first executable become console scripts.
               console=DEBUG or a_name in console_scripts,
               append_pkg=not OSX,
               version=VERSION,
