@@ -56,7 +56,7 @@ class executable(Command):
         os.environ['pyinstaller_data'] = json.dumps({
             'debug': self.debug,
             'name': self.distribution.get_name(),
-            'fullname': getattr(self.distribution, 'fullname',
+            'longname': getattr(self.distribution, 'longname',
                                 self.distribution.get_name())
         })
 

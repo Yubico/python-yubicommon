@@ -64,7 +64,7 @@ dist = pkg_resources.get_distribution(data['name'])
 ver_str = dist.version
 
 DEBUG = bool(data['debug'])
-NAME = data['fullname']
+NAME = data['longname']
 
 WIN = sys.platform in ['win32', 'cygwin']
 OSX = sys.platform in ['darwin']
