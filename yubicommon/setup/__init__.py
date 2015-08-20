@@ -77,6 +77,9 @@ def get_package(module):
 
 
 def setup(**kwargs):
+    # TODO: Find a better way to pass this to a command.
+    os.environ['setup_long_name'] = kwargs.pop('long_name', kwargs.get('name'))
+
     if 'version' not in kwargs:
         kwargs['version'] = get_version()
     packages = kwargs.setdefault(

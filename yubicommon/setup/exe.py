@@ -56,8 +56,7 @@ class executable(Command):
         os.environ['pyinstaller_data'] = json.dumps({
             'debug': self.debug,
             'name': self.distribution.get_name(),
-            'longname': getattr(self.distribution, 'longname',
-                                self.distribution.get_name())
+            'long_name': os.environ['setup_long_name']
         })
 
         spec = tempfile.NamedTemporaryFile(suffix='.spec', delete=False)
