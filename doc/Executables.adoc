@@ -7,20 +7,26 @@ To create the binaries, run the following command:
 
  $ python setup.py executable
 
-To make the command available, you must include it in your projects setup.py:
+To make the command available, you must include it in your projects setup.py.
+You should also specify the *long_name* parameter in addition to *name*, for
+giving the application a more human readable name.
 
+=== Example setup.py snippet
+    from yubicommon.setup import setup
     from yubicommon.setup.exe import executable
 
     setup(
-        ....
+        name='yubioath-desktop',
+        long_name='Yubico Authenticator',
+        cmdclass={
+            'executable': executable
+        },
+        entry_points={
+            'gui_scripts': ['yubioath=yubioath.gui.__main__:main'],
+            'console_scripts': ['yubioath-cli=yubioath.cli.__main__:main']
+        },
+        ...
     )
-
-=== Example setup.py snippet
-
-    entry_points={
-        'gui_scripts': ['yubioath=yubioath.gui.__main__:main'],
-        'console_scripts': ['yubioath-cli=yubioath.cli.__main__:main']
-    },
 
 NOTE: Only entries in *console_scripts* will have their output shown in a
 terminal.
