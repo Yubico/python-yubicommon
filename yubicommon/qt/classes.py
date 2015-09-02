@@ -31,6 +31,7 @@ from .worker import Worker
 import os
 import sys
 import time
+import importlib
 
 __all__ = ['Application', 'Dialog', 'MutexLocker']
 
@@ -97,7 +98,9 @@ class Application(QtGui.QApplication):
             self.basedir = sys._MEIPASS
         else:
             # we are running in a normal Python environment
-            self.basedir = os.path.dirname(__file__)
+            top_module_str = __package__.split('.')[0]
+            top_module = importlib.import_module(top_module_str)
+            self.basedir = os.path.dirname(top_module.__file__)
 
     def ensure_singleton(self, name=None):
         if not name:
