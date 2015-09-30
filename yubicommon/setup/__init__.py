@@ -53,7 +53,8 @@ def get_version(module_name=None):
 
     if module_name is None:
         parts = base_module.split('.')
-        module_name = parts[0] if len(parts) > 1 else find_packages()[0]
+        module_name = parts[0] if len(parts) > 1 else \
+            find_packages(exclude=['test', 'test.*'])[0]
 
     with open('%s/__init__.py' % module_name, 'r') as f:
         match = VERSION_PATTERN.search(f.read())
@@ -83,7 +84,7 @@ def setup(**kwargs):
     if 'version' not in kwargs:
         kwargs['version'] = get_version()
     packages = kwargs.setdefault(
-        'packages', find_packages(exclude=[base_module + '.*']))
+        'packages', find_packages(exclude=['test', 'test.*', base_module + '.*']))
     packages.append(__name__)
     install_requires = kwargs.setdefault('install_requires', [])
     for yc_module in kwargs.pop('yc_requires', []):
