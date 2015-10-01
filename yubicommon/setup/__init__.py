@@ -35,7 +35,7 @@ __all__ = ['get_version', 'setup', 'release']
 from setuptools import setup as _setup, find_packages, Command
 from setuptools.command.sdist import sdist
 from distutils import log
-from distutils.errors import DistutilsSetupError, DistutilsModuleError
+from distutils.errors import DistutilsSetupError
 from datetime import date
 from glob import glob
 import os
@@ -48,15 +48,18 @@ DEPENDENCY_PATTERN = re.compile(
 base_module = __name__.rsplit('.', 1)[0]
 
 
-def get_version(module_name=None):
-    """Return the current version as defined by the given module."""
+def get_version(module_name_or_file=None):
+    """Return the current version as defined by the given module/file."""
 
-    if module_name is None:
+    if module_name_or_file is None:
         parts = base_module.split('.')
-        module_name = parts[0] if len(parts) > 1 else \
+        module_name_or_file = parts[0] if len(parts) > 1 else \
             find_packages(exclude=['test', 'test.*'])[0]
 
-    with open('%s/__init__.py' % module_name, 'r') as f:
+    if os.path.isdir(module_name_or_file):
+        module_name_or_file = os.path.join(module_name_or_file, '__init__.py')
+
+    with open(module_name_or_file, 'r') as f:
         match = VERSION_PATTERN.search(f.read())
         return match.group(1)
 
@@ -84,7 +87,8 @@ def setup(**kwargs):
     if 'version' not in kwargs:
         kwargs['version'] = get_version()
     packages = kwargs.setdefault(
-        'packages', find_packages(exclude=['test', 'test.*', base_module + '.*']))
+        'packages',
+        find_packages(exclude=['test', 'test.*', base_module + '.*']))
     packages.append(__name__)
     install_requires = kwargs.setdefault('install_requires', [])
     for yc_module in kwargs.pop('yc_requires', []):
