@@ -38,14 +38,17 @@ class executable(Command):
     description = "create an executable"
     user_options = [
         ('debug', None, "build with debug flag"),
+        ('data-files', None, "data files to include")
     ]
     boolean_options = ['debug']
 
     def initialize_options(self):
         self.debug = 0
+        self.data_files = ''
 
     def finalize_options(self):
         self.cwd = os.getcwd()
+        self.data_files = self.data_files.split()
 
     def run(self):
         if os.getcwd() != self.cwd:
@@ -56,7 +59,8 @@ class executable(Command):
         os.environ['pyinstaller_data'] = json.dumps({
             'debug': self.debug,
             'name': self.distribution.get_name(),
-            'long_name': os.environ['setup_long_name']
+            'long_name': os.environ['setup_long_name'],
+            'data_files': self.data_files
         })
 
         spec = tempfile.NamedTemporaryFile(suffix='.spec', delete=False)

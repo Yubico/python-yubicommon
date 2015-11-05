@@ -158,6 +158,9 @@ collect = []
 for (a, _, a_name), exe in zip(merge, exes):
     collect += [exe, a.binaries, a.zipfiles, a.datas]
 
+# Data files
+collect.append([(os.path.basename(fn), fn, 'DATA') for fn in data['data_files']])
+
 # DLLs, dylibs and executables should go here.
 collect.append([(fn[4:], fn, 'BINARY') for fn in glob('lib/*')])
 
