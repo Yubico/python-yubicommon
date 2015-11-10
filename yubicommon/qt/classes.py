@@ -82,6 +82,7 @@ class _MainWindow(QtGui.QMainWindow):
 
 
 class Application(QtGui.QApplication):
+    _quit = False
 
     def __init__(self, m=None):
         super(Application, self).__init__(sys.argv)
@@ -124,8 +125,15 @@ class Application(QtGui.QApplication):
         self.window.show()
         self.window.activateWindow()
 
+    def quit(self):
+        super(Application, self).quit()
+        self._quit = True
+
     def exec_(self):
-        status = super(Application, self).exec_()
+        if not self._quit:
+            status = super(Application, self).exec_()
+        else:
+            status = 0
         self.worker.thread().quit()
         self.deleteLater()
         time.sleep(0.01)  # Without this the process sometimes stalls.
