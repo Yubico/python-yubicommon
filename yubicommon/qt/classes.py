@@ -84,8 +84,10 @@ class _MainWindow(QtGui.QMainWindow):
 class Application(QtGui.QApplication):
     _quit = False
 
-    def __init__(self, m=None):
+    def __init__(self, m=None, version=None):
         super(Application, self).__init__(sys.argv)
+        self._determine_basedir()
+        self._read_package_version(version)
 
         self.window = _MainWindow()
 
@@ -94,6 +96,7 @@ class Application(QtGui.QApplication):
 
         self.worker = Worker(self.window, m)
 
+    def _determine_basedir(self):
         if getattr(sys, 'frozen', False):
             # we are running in a PyInstaller bundle
             self.basedir = sys._MEIPASS
@@ -102,6 +105,23 @@ class Application(QtGui.QApplication):
             top_module_str = __package__.split('.')[0]
             top_module = importlib.import_module(top_module_str)
             self.basedir = os.path.dirname(top_module.__file__)
+
+    def _read_package_version(self, version):
+        if version is None:
+            return
+
+        pversion_fn = os.path.join(self.basedir, 'package_version.txt')
+        try:
+            with open(pversion_fn, 'r') as f:
+                pversion = int(f.read().strip())
+        except:
+            pversion = 0
+
+        if pversion > 0:
+            version += '.%d' % pversion
+
+        self.version = version
+        print self.version
 
     def ensure_singleton(self, name=None):
         if not name:

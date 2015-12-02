@@ -61,7 +61,6 @@ try:
 except NameError:
     pass  # Python 3, encode not needed.
 dist = pkg_resources.get_distribution(data['name'])
-ver_str = dist.version
 
 DEBUG = bool(data['debug'])
 NAME = data['long_name']
@@ -69,6 +68,9 @@ NAME = data['long_name']
 WIN = sys.platform in ['win32', 'cygwin']
 OSX = sys.platform in ['darwin']
 
+ver_str = dist.version
+if data['package_version'] > 0:
+    ver_str += '.%d' % data['package_version']
 file_ext = '.exe' if WIN else ''
 
 if WIN:
@@ -129,7 +131,7 @@ if WIN:
             'internal_name': data['name'],
             'ver_tup': ver_tup,
             'ver_str': ver_str,
-            'exe_name': NAME + file_ext
+            'exe_name': data['name'] + file_ext
         })
 
 pyzs = [PYZ(m[0].pure) for m in merge]
@@ -165,6 +167,11 @@ collect.append([(os.path.basename(fn), fn, 'DATA') for fn in data['data_files']]
 collect.append([(fn[4:], fn, 'BINARY') for fn in glob('lib/*')])
 
 coll = COLLECT(*collect, strip=None, upx=True, name=NAME)
+
+# Write package version for app to display
+pversion_fn = os.path.join('dist', NAME, 'package_version.txt')
+with open(pversion_fn, 'w') as f:
+    f.write(str(data['package_version']))
 
 # Create .app for OSX
 if OSX:
