@@ -121,7 +121,6 @@ class Application(QtGui.QApplication):
             version += '.%d' % pversion
 
         self.version = version
-        print self.version
 
     def ensure_singleton(self, name=None):
         if not name:
