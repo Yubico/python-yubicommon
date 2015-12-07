@@ -47,10 +47,6 @@ class Dialog(QtGui.QDialog):
                             ^ QtCore.Qt.WindowContextHelpButtonHint)
         self._headers = _Headers()
 
-    @property
-    def headers(self):
-        return self._headers
-
     def section(self, title):
         return self._headers.section(title)
 
