@@ -92,7 +92,9 @@ class Application(QtGui.QApplication):
         self.window = _MainWindow()
 
         if m:
-            m._translate(self)
+            for key in dir(m):
+                if isinstance(key, basestring) and not key.startswith('_'):
+                    setattr(m, key, self.tr(getattr(m, key)))
 
         self.worker = Worker(self.window, m)
 
