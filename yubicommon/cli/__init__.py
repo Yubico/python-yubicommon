@@ -25,9 +25,13 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import absolute_import
+from __future__ import print_function
 
 from docopt import docopt, DocoptExit
 import sys
+
+from .. import compat
 
 __all__ = ['CliCommand', 'Argument']
 
@@ -41,14 +45,14 @@ def trim(docstring):
     # and split into a list of lines:
     lines = docstring.expandtabs().splitlines()
     # Determine minimum indentation (first line doesn't count):
-    indent = sys.maxint
+    indent = sys.maxsize
     for line in lines[1:]:
         stripped = line.lstrip()
         if stripped:
             indent = min(indent, len(line) - len(stripped))
     # Remove indentation (first line is special):
     trimmed = [lines[0].strip()]
-    if indent < sys.maxint:
+    if indent < sys.maxsize:
         for line in lines[1:]:
             trimmed.append(line[indent:].rstrip())
     # Strip off trailing and leading blank lines:
@@ -67,7 +71,7 @@ class Argument(object):
         self._default = default
 
     def __call__(self, args):
-        if isinstance(self._name, basestring):
+        if isinstance(self._name, compat.string_types):
             value = args[self._name]
         else:
             value = None
@@ -92,5 +96,5 @@ class CliCommand(object):
                 try:
                     setattr(self, f, value(self._args))
                 except ValueError as e:
-                    print "Error for option {}: {}".format(value._name, e)
+                    print("Error for option {}: {}".format(value._name, e))
                     raise DocoptExit()
