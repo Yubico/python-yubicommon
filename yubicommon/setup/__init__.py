@@ -91,7 +91,7 @@ def setup(**kwargs):
         find_packages(exclude=['test', 'test.*', base_module + '.*']))
     packages.append(__name__)
     install_requires = kwargs.setdefault('install_requires', [])
-    yc_blacklist = kwargs.pop('yc_requires_exclude')
+    yc_blacklist = kwargs.pop('yc_requires_exclude', [])
     for yc_module in kwargs.pop('yc_requires', []):
         packages.append(get_package(yc_module))
         for dep in get_dependencies(yc_module):
