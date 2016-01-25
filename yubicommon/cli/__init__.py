@@ -25,10 +25,13 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import absolute_import
 from __future__ import print_function
 
 from docopt import docopt, DocoptExit
 import sys
+
+from .. import compat
 
 __all__ = ['CliCommand', 'Argument']
 
@@ -68,7 +71,7 @@ class Argument(object):
         self._default = default
 
     def __call__(self, args):
-        if isinstance(self._name, basestring):
+        if isinstance(self._name, compat.string_types):
             value = args[self._name]
         else:
             value = None

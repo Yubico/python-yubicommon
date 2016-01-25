@@ -33,6 +33,8 @@ import sys
 import time
 import importlib
 
+from .. import compat
+
 __all__ = ['Application', 'Dialog', 'MutexLocker']
 
 TOP_SECTION = '<b>%s</b>'
@@ -93,7 +95,8 @@ class Application(QtGui.QApplication):
 
         if m:
             for key in dir(m):
-                if isinstance(key, basestring) and not key.startswith('_'):
+                if (isinstance(key, compat.string_types)
+                        and not key.startswith('_')):
                     setattr(m, key, self.tr(getattr(m, key)))
 
         self.worker = Worker(self.window, m)
