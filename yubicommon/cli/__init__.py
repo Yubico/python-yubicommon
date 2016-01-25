@@ -25,6 +25,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import print_function
 
 from docopt import docopt, DocoptExit
 import sys
@@ -92,5 +93,5 @@ class CliCommand(object):
                 try:
                     setattr(self, f, value(self._args))
                 except ValueError as e:
-                    print "Error for option {}: {}".format(value._name, e)
+                    print("Error for option {}: {}".format(value._name, e))
                     raise DocoptExit()
