@@ -11,6 +11,8 @@ import errno
 import pkg_resources
 from glob import glob
 
+from .. import compat
+
 
 VS_VERSION_INFO = """
 VSVersionInfo(
@@ -56,7 +58,7 @@ VSVersionInfo(
 
 data = json.loads(os.environ['pyinstaller_data'])
 try:
-    data = dict((k, v.encode('ascii') if isinstance(v, unicode) else v)
+    data = dict((k, v.encode('ascii') if isinstance(v, compat.string_types) else v)
                 for k, v in data.items())
 except NameError:
     pass  # Python 3, encode not needed.
