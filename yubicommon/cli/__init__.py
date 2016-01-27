@@ -65,25 +65,61 @@ def trim(docstring):
 
 
 class Argument(object):
-    def __init__(self, name, santitize=lambda x: x, default=None):
-        self._name = name
+    """
+    Single argument in a subclass of CliCommand.
+
+    key should be the name of the parameter in the docopt string,
+    or an iterable containing mutually exclusive commands.
+
+    See CliCommand for example usage.
+    """
+
+    def __init__(self, key, santitize=lambda x: x, default=None):
+        self._key = key
         self._sanitize = santitize
         self._default = default
 
-    def __call__(self, args):
-        if isinstance(self._name, compat.string_types):
-            value = args[self._name]
+    def __get__(self, instance, objtype):
+        return getattr(self, '_value', self)
+
+    def set_value(self, args):
+        if isinstance(self._key, compat.string_types):
+            value = args[self._key]
         else:
             value = None
-            for key in self._name:
+            for key in self._key:
                 if args.get(key, False) is True:
                     value = key
                     break
-        return self._sanitize(value) if value is not None else self._default
+        self._value = self._sanitize(value) \
+            if value is not None else self._default
 
 
 class CliCommand(object):
-    """Subclasses should contain a docopt compatible docstring."""
+    """
+    A command in a CLI program, using a docopt compatitbe docstring.
+
+    Use the Argument class to help parse the arguments, which are provided by
+    docopt, either passed to the constructor or read from sys.argv.
+
+    For example:
+
+    class Foo(CliCommand):
+        \"\"\"
+        Usage:
+            foo add [--count N]
+            foo rm
+        \"\"\"
+
+        subcommand = Argument(['add', 'rm'])  # Will be 'add' or 'rm'
+        count = Argument('--count', int, 5)  # Will be an int, defaulting to 5
+
+        def do_something(self):
+            if self.subcommand == 'add':
+                self.add(self.count)
+            elif self.subcommand == 'rm':
+                self.remove()
+    """
 
     def __init__(self, *args, **kwargs):
         # Parse args
@@ -91,10 +127,10 @@ class CliCommand(object):
 
         # Populate Arguments from args
         for f in dir(self):
-            value = getattr(self, f)
-            if isinstance(value, Argument):
+            arg = getattr(self, f)
+            if isinstance(arg, Argument):
                 try:
-                    setattr(self, f, value(self._args))
-                except ValueError as e:
-                    print("Error for option {}: {}".format(value._name, e))
+                    arg.set_value(self._args)
+                except (ValueError, TypeError) as e:
+                    print("Error for option {}: {}".format(arg._name, e))
                     raise DocoptExit()
