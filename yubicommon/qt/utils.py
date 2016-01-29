@@ -30,7 +30,7 @@ from PySide import QtCore, QtGui
 from functools import wraps
 from inspect import getargspec
 
-__all__ = ['get_text', 'get_active_window']
+__all__ = ['get_text', 'get_active_window', 'is_minimized', 'connect_once']
 
 
 class _DefaultMessages(object):
