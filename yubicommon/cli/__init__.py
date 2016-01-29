@@ -132,5 +132,5 @@ class CliCommand(object):
                 try:
                     arg.set_value(self._args)
                 except (ValueError, TypeError) as e:
-                    print("Error for option {}: {}".format(arg._name, e))
+                    print("Error for option {}: {}".format(arg._key, e))
                     raise DocoptExit()
