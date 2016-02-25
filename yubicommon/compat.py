@@ -8,6 +8,7 @@ import sys
 __all__ = [
     'string_types',
     'binary_type',
+    'text_type',
     'int2byte',
     'byte2int'
 ]
@@ -17,13 +18,15 @@ __all__ = [
 if sys.version_info < (3, 0):
     # Python 2.x
     _PY2 = True
-    string_types = basestring
+    string_types = (basestring,)
     binary_type = str
+    text_type = unicode
 else:
     # Python 3.x
     _PY2 = False
-    string_types = str
+    string_types = (str,)
     binary_type = bytes
+    text_type = str
 
 def int2byte(i):
     if _PY2:
