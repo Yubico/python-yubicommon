@@ -66,7 +66,7 @@ class _qt_resources(Command):
 
         qrc = self._create_qrc()
         self.execute(os.system,
-                     ('pyside-rcc "%s" -o "%s"' % (qrc, self.target),))
+                     ('pyside-rcc -py3 "%s" -o "%s"' % (qrc, self.target),))
         os.unlink(qrc)
 
         self.announce("QT resources compiled into %s" % self.target)
