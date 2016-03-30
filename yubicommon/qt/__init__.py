@@ -50,9 +50,12 @@ if sys.platform == 'darwin':
 # Replace excepthook with one that releases the exception to prevent memory
 # leaks:
 def excepthook(typ, val, tback):
-    traceback.print_exception(typ, val, tback)
-    sys.exc_clear()
-    del sys.last_value
-    del sys.last_traceback
-    del sys.last_type
+    try:
+        traceback.print_exception(typ, val, tback)
+        sys.exc_clear()
+        del sys.last_value
+        del sys.last_traceback
+        del sys.last_type
+    except:
+        pass  # Ignore failure here, we're likely shutting down...
 sys.excepthook = excepthook

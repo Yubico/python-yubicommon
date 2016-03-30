@@ -28,6 +28,7 @@ from __future__ import absolute_import
 
 from PySide import QtGui, QtCore
 from functools import partial
+from os import getenv
 from .utils import get_active_window, default_messages
 import traceback
 
@@ -97,8 +98,9 @@ class Worker(QtCore.QObject):
         try:
             result = fn()
         except Exception as e:
-            traceback.print_exc()
             result = e
+            if getenv('DEBUG'):
+                traceback.print_exc()
             if not return_errors:
                 def callback(e): raise e
         if callback:

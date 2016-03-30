@@ -30,7 +30,6 @@ from PySide import QtGui, QtCore
 from .worker import Worker
 import os
 import sys
-import time
 import importlib
 
 from .. import compat
@@ -93,7 +92,7 @@ class Application(QtGui.QApplication):
 
         self.window = _MainWindow()
 
-        if m:
+        if m:  # Run all strings through Qt translation
             for key in dir(m):
                 if (isinstance(key, compat.string_types)
                         and not key.startswith('_')):
@@ -134,9 +133,7 @@ class Application(QtGui.QApplication):
         self._l_socket = QtNetwork.QLocalSocket()
         self._l_socket.connectToServer(name, QtCore.QIODevice.WriteOnly)
         if self._l_socket.waitForConnected():
-            self.worker.thread().quit()
-            self.deleteLater()
-            time.sleep(0.01)  # Without this the process sometimes stalls.
+            self._stop()
             sys.exit(0)
         else:
             self._l_server = QtNetwork.QLocalServer()
@@ -153,14 +150,20 @@ class Application(QtGui.QApplication):
         super(Application, self).quit()
         self._quit = True
 
+    def _stop(self):
+        worker_thread = self.worker.thread()
+        worker_thread.quit()
+        worker_thread.wait()
+        self.deleteLater()
+        sys.stdout.flush()
+        sys.stderr.flush()
+
     def exec_(self):
         if not self._quit:
             status = super(Application, self).exec_()
         else:
             status = 0
-        self.worker.thread().quit()
-        self.deleteLater()
-        time.sleep(0.01)  # Without this the process sometimes stalls.
+        self._stop()
         return status
 
 
