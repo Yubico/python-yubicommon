@@ -39,7 +39,7 @@ import traceback
 # Font fixes for OSX
 if sys.platform == 'darwin':
     from platform import mac_ver
-    mac_version = tuple(mac_ver()[0].split('.'))
+    mac_version = tuple(int(x) for x in mac_ver()[0].split('.'))
     if (10, 9) <= mac_version < (10, 10):  # Mavericks
         QtGui.QFont.insertSubstitution('.Lucida Grande UI', 'Lucida Grande')
     if (10, 10) <= mac_version:  # Yosemite
