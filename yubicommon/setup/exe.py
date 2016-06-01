@@ -57,7 +57,7 @@ class executable(Command):
         if os.getcwd() != self.cwd:
             raise DistutilsSetupError("Must be in package root!")
 
-        from PyInstaller.main import run as pyinst_run
+        from PyInstaller.__main__ import run as pyinst_run
 
         os.environ['pyinstaller_data'] = json.dumps({
             'debug': self.debug,
