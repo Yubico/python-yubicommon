@@ -33,6 +33,7 @@ import os
 
 
 __dependencies__ = ['PySide']
+__yc_dependencies__ = ['ctypes']
 __all__ = ['qt_resources']
 
 
