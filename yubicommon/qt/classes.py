@@ -31,8 +31,8 @@ from .worker import Worker
 import os
 import sys
 import importlib
-
 from .. import compat
+from .osx import osx_hide
 
 __all__ = ['Application', 'Dialog', 'MutexLocker']
 
@@ -74,8 +74,13 @@ class _MainWindow(QtGui.QMainWindow):
 
     def __init__(self):
         super(_MainWindow, self).__init__()
-
         self._widget = None
+
+    def hide(self):
+        if sys.platform == 'darwin':
+            osx_hide()
+        else:
+            super(_MainWindow, self).hide()
 
     def customEvent(self, event):
         event.callback()
