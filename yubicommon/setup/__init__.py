@@ -44,6 +44,8 @@ import re
 VERSION_PATTERN = re.compile(r"(?m)^__version__\s*=\s*['\"](.+)['\"]$")
 DEPENDENCY_PATTERN = re.compile(
     r"(?m)__dependencies__\s*=\s*\[((['\"].+['\"]\s*(,\s*)?)+)\]")
+YC_DEPENDENCY_PATTERN = re.compile(
+    r"(?m)__yc_dependencies__\s*=\s*\[((['\"].+['\"]\s*(,\s*)?)+)\]")
 
 base_module = __name__.rsplit('.', 1)[0]
 
@@ -76,6 +78,18 @@ def get_dependencies(module):
     return []
 
 
+def get_yc_dependencies(module):
+    basedir = os.path.dirname(__file__)
+    fn = os.path.join(basedir, module + '.py')
+    if os.path.isfile(fn):
+        with open(fn, 'r') as f:
+            match = YC_DEPENDENCY_PATTERN.search(f.read())
+            if match:
+                return [s.strip().strip('"\'')
+                        for s in match.group(1).split(',')]
+    return []
+
+
 def get_package(module):
     return base_module + '.' + module
 
@@ -92,7 +106,15 @@ def setup(**kwargs):
     packages.append(__name__)
     install_requires = kwargs.setdefault('install_requires', [])
     yc_blacklist = kwargs.pop('yc_requires_exclude', [])
-    for yc_module in kwargs.pop('yc_requires', []):
+    yc_requires = kwargs.pop('yc_requires', [])
+    yc_requires_stack = yc_requires[:]
+    while yc_requires_stack:
+        yc_module = yc_requires_stack.pop()
+        for yc_dep in get_yc_dependencies(yc_module):
+            if yc_dep not in yc_requires:
+                yc_requires.append(yc_dep)
+                yc_requires_stack.append(yc_dep)
+    for yc_module in yc_requires:
         packages.append(get_package(yc_module))
         for dep in get_dependencies(yc_module):
             if dep not in install_requires and dep not in yc_blacklist:
