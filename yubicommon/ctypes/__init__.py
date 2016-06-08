@@ -27,4 +27,22 @@
 
 from .libloader import load_library
 
-__all__ = ['load_library']
+__all__ = ['load_library', 'use_library']
+
+
+def use_library(libname, version=None):
+    lib = load_library(libname, version)
+
+    def define(func_name, argtypes, restype=None):
+        try:
+            f = getattr(lib, func_name)
+            f.argtypes = argtypes
+            f.restype = restype
+        except AttributeError:
+            print("Undefined symbol: %s" % func_name)
+
+            def error(*args, **kwargs):
+                raise Exception("Undefined symbol: %s" % func_name)
+            f = error
+        return f
+    return define
