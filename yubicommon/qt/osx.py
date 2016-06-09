@@ -25,23 +25,25 @@
 # for the parts of OpenSSL used as well as that of the covered work.
 
 import ctypes
-from ..ctypes import load_library
+from ..ctypes import CLibrary
+
+__all__ = ['app_services']
+
 
 class ProcessSerialNumber(ctypes.Structure):
     _fields_ = [('highLongOfPsn', ctypes.c_uint32),
                 ('lowLongOfPSN', ctypes.c_uint32)]
 
 
-def osx_hide():
+class ApplicationServices(CLibrary):
+    ShowHideProcess = [ctypes.POINTER(ProcessSerialNumber), ctypes.c_bool], None
+    GetFrontProcess = [ctypes.POINTER(ProcessSerialNumber)], None
 
-    """ Hide the window and let the dock
-    icon be able to show the window again. """
+    def osx_hide(self):
+        """ Hide the window and let the dock
+        icon be able to show the window again. """
+        psn = ProcessSerialNumber()
+        self.GetFrontProcess(ctypes.byref(psn))
+        self.ShowHideProcess(ctypes.byref(psn), False)
 
-    app_services = load_library('ApplicationServices')
-    show_hide_proc = app_services.ShowHideProcess
-    show_hide_proc.argtypes = [ctypes.POINTER(ProcessSerialNumber),
-                            ctypes.c_bool]
-
-    psn = ProcessSerialNumber()
-    app_services.GetFrontProcess(ctypes.byref(psn))
-    show_hide_proc(ctypes.byref(psn), False)
+app_services = ApplicationServices('ApplicationServices')

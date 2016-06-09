@@ -32,7 +32,7 @@ import os
 import sys
 import importlib
 from .. import compat
-from .osx import osx_hide
+from .osx import app_services
 
 __all__ = ['Application', 'Dialog', 'MutexLocker']
 
@@ -44,8 +44,8 @@ class Dialog(QtGui.QDialog):
 
     def __init__(self, *args, **kwargs):
         super(Dialog, self).__init__(*args, **kwargs)
-        self.setWindowFlags(self.windowFlags()
-                            ^ QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() ^
+                            QtCore.Qt.WindowContextHelpButtonHint)
         self._headers = _Headers()
 
     @property
@@ -78,7 +78,7 @@ class _MainWindow(QtGui.QMainWindow):
 
     def hide(self):
         if sys.platform == 'darwin':
-            osx_hide()
+            app_services.osx_hide()
         else:
             super(_MainWindow, self).hide()
 
@@ -99,8 +99,8 @@ class Application(QtGui.QApplication):
 
         if m:  # Run all strings through Qt translation
             for key in dir(m):
-                if (isinstance(key, compat.string_types)
-                        and not key.startswith('_')):
+                if (isinstance(key, compat.string_types) and
+                        not key.startswith('_')):
                     setattr(m, key, self.tr(getattr(m, key)))
 
         self.worker = Worker(self.window, m)
