@@ -32,7 +32,6 @@ import os
 import sys
 import importlib
 from .. import compat
-from .osx import app_services
 
 __all__ = ['Application', 'Dialog', 'MutexLocker']
 
@@ -78,6 +77,7 @@ class _MainWindow(QtGui.QMainWindow):
 
     def hide(self):
         if sys.platform == 'darwin':
+            from .osx import app_services
             app_services.osx_hide()
         else:
             super(_MainWindow, self).hide()
