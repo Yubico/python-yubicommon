@@ -42,10 +42,11 @@ if sys.platform == 'darwin':
     mac_version = tuple(int(x) for x in mac_ver()[0].split('.'))
     if (10, 9) <= mac_version < (10, 10):  # Mavericks
         QtGui.QFont.insertSubstitution('.Lucida Grande UI', 'Lucida Grande')
-    if (10, 10) <= mac_version:  # Yosemite
+    if (10, 10) <= mac_version < (10, 11):  # Yosemite
         QtGui.QFont.insertSubstitution('.Helvetica Neue DeskInterface',
                                        'Helvetica Neue')
-
+    if (10, 11) <= mac_version:  #El Capitan
+        QtGui.QFont.insertSubstitution('.SF NS Text', 'Helvetica Neue')
 
 # Replace excepthook with one that releases the exception to prevent memory
 # leaks:
