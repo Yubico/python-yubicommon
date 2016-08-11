@@ -29,7 +29,7 @@ from __future__ import absolute_import
 from PySide import QtGui, QtCore
 from functools import partial
 from os import getenv
-from .utils import get_active_window, default_messages
+from .utils import connect_once, get_active_window, default_messages
 import traceback
 
 
@@ -56,29 +56,24 @@ class Worker(QtCore.QObject):
     @default_messages(_Messages)
     def __init__(self, window, m):
         super(Worker, self).__init__()
-
+        self.m = m
         self.window = window
-
-        self.busy = QtGui.QProgressDialog('', None, 0, 0, window)
-        self.busy.setWindowTitle(m.wait)
-        self.busy.setWindowModality(QtCore.Qt.WindowModal)
-        self.busy.setMinimumDuration(0)
-        self.busy.setWindowFlags(self.busy.windowFlags()
-                                 ^ QtCore.Qt.WindowContextHelpButtonHint)
-        self.busy.setAutoClose(True)
-
+        self._work_signal.connect(self.work)
         self.work_thread = QtCore.QThread()
         self.moveToThread(self.work_thread)
         self.work_thread.start()
 
-        self._work_signal.connect(self.work)
-        self._work_done_0.connect(self.busy.reset)
 
     def post(self, title, fn, callback=None, return_errors=False):
-        self.busy.setLabelText(title)
-        self.busy.adjustPosition(get_active_window())
-        self.busy.show()
+        busy = QtGui.QProgressDialog(title, None, 0, 0, get_active_window())
+        busy.setWindowTitle(self.m.wait)
+        busy.setWindowModality(QtCore.Qt.WindowModal)
+        busy.setMinimumDuration(0)
+        busy.setWindowFlags(busy.windowFlags() ^ QtCore.Qt.WindowContextHelpButtonHint)
+        busy.show()
         self.post_bg(fn, callback, return_errors)
+        connect_once(self._work_done_0, busy.close)
+
 
     def post_bg(self, fn, callback=None, return_errors=False):
         if isinstance(fn, tuple):
