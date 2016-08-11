@@ -63,17 +63,16 @@ class Worker(QtCore.QObject):
         self.moveToThread(self.work_thread)
         self.work_thread.start()
 
-
     def post(self, title, fn, callback=None, return_errors=False):
         busy = QtGui.QProgressDialog(title, None, 0, 0, get_active_window())
         busy.setWindowTitle(self.m.wait)
         busy.setWindowModality(QtCore.Qt.WindowModal)
         busy.setMinimumDuration(0)
-        busy.setWindowFlags(busy.windowFlags() ^ QtCore.Qt.WindowContextHelpButtonHint)
+        busy.setWindowFlags(
+            busy.windowFlags() ^ QtCore.Qt.WindowContextHelpButtonHint)
         busy.show()
-        self.post_bg(fn, callback, return_errors)
         connect_once(self._work_done_0, busy.close)
-
+        self.post_bg(fn, callback, return_errors)
 
     def post_bg(self, fn, callback=None, return_errors=False):
         if isinstance(fn, tuple):
