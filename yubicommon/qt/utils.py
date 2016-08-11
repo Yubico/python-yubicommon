@@ -83,10 +83,16 @@ def get_active_window():
     return wins[0]  # TODO: If more than one candidates remain, find best one.
 
 
+_single_shots = set()
+
+
 def connect_once(signal, slot):
     def wrapped(*args, **kwargs):
+        _single_shots.discard(wrapped)
         signal.disconnect(wrapped)
         slot(*args, **kwargs)
+
+    _single_shots.add(wrapped)  # Prevent wrapped from being GC'd too early
     signal.connect(wrapped)
 
 
