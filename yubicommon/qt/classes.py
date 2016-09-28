@@ -79,8 +79,7 @@ class _MainWindow(QtGui.QMainWindow):
         if sys.platform == 'darwin':
             from .osx import app_services
             app_services.osx_hide()
-        else:
-            super(_MainWindow, self).hide()
+        super(_MainWindow, self).hide()
 
     def customEvent(self, event):
         event.callback()
@@ -104,6 +103,11 @@ class Application(QtGui.QApplication):
                     setattr(m, key, self.tr(getattr(m, key)))
 
         self.worker = Worker(self.window, m)
+
+    def event(self, event):
+        if sys.platform == "darwin" and event.type() == QtCore.QEvent.ApplicationActivate:
+            self.window.show()
+        return super(Application, self).event(event)
 
     def _determine_basedir(self):
         if getattr(sys, 'frozen', False):
