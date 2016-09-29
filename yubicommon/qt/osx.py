@@ -36,7 +36,8 @@ class ProcessSerialNumber(ctypes.Structure):
 
 
 class ApplicationServices(CLibrary):
-    ShowHideProcess = [ctypes.POINTER(ProcessSerialNumber), ctypes.c_bool], None
+    ShowHideProcess = \
+        [ctypes.POINTER(ProcessSerialNumber), ctypes.c_bool], None
     GetFrontProcess = [ctypes.POINTER(ProcessSerialNumber)], None
 
     def osx_hide(self):

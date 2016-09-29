@@ -105,8 +105,9 @@ class Application(QtGui.QApplication):
         self.worker = Worker(self.window, m)
 
     def event(self, event):
-        if sys.platform == "darwin" and event.type() == QtCore.QEvent.ApplicationActivate:
-            self.window.show()
+        if sys.platform == "darwin" and event.type() \
+                == QtCore.QEvent.ApplicationActivate:
+                self.window.show()
         return super(Application, self).event(event)
 
     def _determine_basedir(self):

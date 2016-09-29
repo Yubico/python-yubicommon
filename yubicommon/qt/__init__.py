@@ -28,10 +28,6 @@
 from __future__ import absolute_import
 
 from PySide import QtGui
-from .utils import *
-from .classes import *
-from .worker import *
-from .settings import *
 import sys
 import traceback
 
@@ -45,8 +41,9 @@ if sys.platform == 'darwin':
     if (10, 10) <= mac_version < (10, 11):  # Yosemite
         QtGui.QFont.insertSubstitution('.Helvetica Neue DeskInterface',
                                        'Helvetica Neue')
-    if (10, 11) <= mac_version:  #El Capitan
+    if (10, 11) <= mac_version:  # El Capitan
         QtGui.QFont.insertSubstitution('.SF NS Text', 'Helvetica Neue')
+
 
 # Replace excepthook with one that releases the exception to prevent memory
 # leaks:

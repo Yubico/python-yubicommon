@@ -26,12 +26,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from __future__ import absolute_import
-
-
-__dependencies__ = []
-__all__ = ['get_version', 'setup', 'release']
-
-
 from setuptools import setup as _setup, find_packages, Command
 from setuptools.command.sdist import sdist
 from distutils import log
@@ -40,6 +34,10 @@ from datetime import date
 from glob import glob
 import os
 import re
+
+__dependencies__ = []
+__all__ = ['get_version', 'setup', 'release']
+
 
 VERSION_PATTERN = re.compile(r"(?m)^__version__\s*=\s*['\"](.+)['\"]$")
 DEPENDENCY_PATTERN = re.compile(

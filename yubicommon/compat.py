@@ -18,9 +18,9 @@ __all__ = [
 if sys.version_info < (3, 0):
     # Python 2.x
     _PY2 = True
-    string_types = (basestring,)
+    string_types = (basestring,)  # noqa: F821
     binary_type = str
-    text_type = unicode
+    text_type = unicode  # noqa: F821
 else:
     # Python 3.x
     _PY2 = False
@@ -28,10 +28,12 @@ else:
     binary_type = bytes
     text_type = str
 
+
 def int2byte(i):
     if _PY2:
         return chr(i)
     return bytes((i,))
+
 
 def byte2int(i):
     if _PY2:

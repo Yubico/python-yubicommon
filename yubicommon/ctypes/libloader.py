@@ -214,7 +214,6 @@ class PosixLibraryLoader(LibraryLoader):
 
         cache = {}
         lib_re = re.compile(r'lib(.*)\.s[ol]')
-        ext_re = re.compile(r'\.s[ol]$')
         for dir in directories:
             try:
                 for path in glob.glob("%s/*.s[ol]*" % dir):
