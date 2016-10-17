@@ -151,6 +151,9 @@ class DarwinLibraryLoader(LibraryLoader):
         if hasattr(sys, 'frozen'):
             dirs.append(sys._MEIPASS)
 
+        dirs.append(
+            os.path.join(os.path.dirname(sys.executable), '../Frameworks'))
+
         dirs.extend(dyld_fallback_library_path)
 
         return dirs
