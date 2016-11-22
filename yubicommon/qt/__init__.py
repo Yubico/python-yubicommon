@@ -25,11 +25,18 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+# flake8: noqa
+
 from __future__ import absolute_import
 
 from PySide import QtGui
 import sys
 import traceback
+
+from .utils import *
+from .classes import *
+from .worker import *
+from .settings import *
 
 
 # Font fixes for OSX
