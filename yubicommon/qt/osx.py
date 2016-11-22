@@ -47,4 +47,5 @@ class ApplicationServices(CLibrary):
         self.GetFrontProcess(ctypes.byref(psn))
         self.ShowHideProcess(ctypes.byref(psn), False)
 
+
 app_services = ApplicationServices('ApplicationServices')

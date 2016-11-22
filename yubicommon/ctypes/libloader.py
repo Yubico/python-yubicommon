@@ -314,17 +314,20 @@ class WindowsLibraryLoader(LibraryLoader):
 # If your value of sys.platform does not appear in this dict, please contact
 # the Ctypesgen maintainers.
 
+
 loaderclass = {
     "darwin":   DarwinLibraryLoader,
     "cygwin":   WindowsLibraryLoader,
     "win32":    WindowsLibraryLoader
 }
 
+
 loader = loaderclass.get(sys.platform, PosixLibraryLoader)()
 
 
 def add_library_search_dirs(other_dirs):
     loader.other_dirs = other_dirs
+
 
 load_library = loader.load_library
 
