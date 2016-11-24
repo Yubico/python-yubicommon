@@ -55,10 +55,10 @@ class LibraryLoader(object):
     def __init__(self):
         self.other_dirs = []
 
-    def load_library(self, libname, version=None):
+    def load_library(self, libname, version=None, extra_paths=[]):
         """Given the name of a library, load it."""
 
-        paths = self.getpaths(libname)
+        paths = self.getpaths(libname, extra_paths)
 
         for path in paths:
             if os.path.exists(path):
@@ -80,20 +80,20 @@ class LibraryLoader(object):
         except OSError as e:
             raise ImportError(e)
 
-    def getpaths(self, libname):
+    def getpaths(self, libname, extra_paths):
         """Return a list of paths where the library might be found."""
         if os.path.isabs(libname):
             yield libname
         else:
             # FIXME / TODO return '.' and os.path.dirname(__file__)
-            for path in self.getplatformpaths(libname):
+            for path in self.getplatformpaths(libname, extra_paths):
                 yield path
 
             path = ctypes.util.find_library(libname)
             if path:
                 yield path
 
-    def getplatformpaths(self, libname):
+    def getplatformpaths(self, libname, extra_paths):
         return []
 
 # Darwin (Mac OS X)
@@ -103,13 +103,13 @@ class DarwinLibraryLoader(LibraryLoader):
     name_formats = ["lib%s.dylib", "lib%s.so", "lib%s.bundle", "%s.dylib",
                     "%s.so", "%s.bundle", "%s"]
 
-    def getplatformpaths(self, libname):
+    def getplatformpaths(self, libname, extra_paths):
         if os.path.pathsep in libname:
             names = [libname]
         else:
             names = [format % libname for format in self.name_formats]
 
-        for dir in self.getdirs(libname):
+        for dir in extra_paths + self.getdirs(libname):
             for name in names:
                 yield os.path.join(dir, name)
 
@@ -164,12 +164,15 @@ class DarwinLibraryLoader(LibraryLoader):
 class PosixLibraryLoader(LibraryLoader):
     _ld_so_cache = None
 
-    def load_library(self, libname, version=None):
+    def load_library(self, libname, version=None, extra_paths=[]):
         try:
-            return self.load(ctypes.util.find_library(libname))
+            found = ctypes.util.find_library(libname)
+            if found is not None:
+                return self.load(found)
         except ImportError:
-            return super(PosixLibraryLoader, self).load_library(
-                libname, version)
+            pass
+        return super(PosixLibraryLoader, self).load_library(
+            libname, version, extra_paths)
 
     def _create_ld_so_cache(self):
         # Recreate search path followed by ld.so.  This is going to be
@@ -237,9 +240,13 @@ class PosixLibraryLoader(LibraryLoader):
 
         self._ld_so_cache = cache
 
-    def getplatformpaths(self, libname):
+    def getplatformpaths(self, libname, extra_paths):
         if self._ld_so_cache is None:
             self._create_ld_so_cache()
+
+        for dir in extra_paths:
+            for path in glob.glob("%s/lib%s*.s[ol]*" % (dir, libname)):
+                yield path
 
         result = self._ld_so_cache.get(libname)
         if result:
@@ -271,9 +278,10 @@ class _WindowsLibrary(object):
 class WindowsLibraryLoader(LibraryLoader):
     name_formats = ["%s.dll", "lib%s.dll", "%slib.dll"]
 
-    def load_library(self, libname, version=None):
+    def load_library(self, libname, version=None, extra_paths=[]):
         try:
-            result = LibraryLoader.load_library(self, libname, version)
+            result = LibraryLoader.load_library(self, libname, version,
+                                                extra_paths)
         except ImportError:
             result = None
             if os.path.sep not in libname:
@@ -299,12 +307,14 @@ class WindowsLibraryLoader(LibraryLoader):
     def load(self, path):
         return _WindowsLibrary(path)
 
-    def getplatformpaths(self, libname):
+    def getplatformpaths(self, libname, extra_paths):
         if os.path.sep not in libname:
             for name in self.name_formats:
-                dll_in_current_dir = os.path.abspath(name % libname)
-                if os.path.exists(dll_in_current_dir):
-                    yield dll_in_current_dir
+                for dir in extra_paths + ['.']:  # Include cwd
+                    dll_path = os.path.abspath(
+                        os.path.join(dir, name % libname))
+                    if os.path.exists(dll_path):
+                        yield dll_path
                 path = ctypes.util.find_library(name % libname)
                 if path:
                     yield path

@@ -26,12 +26,14 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from .libloader import load_library
+import os
+import sys
 
 __all__ = ['load_library', 'use_library', 'CLibrary']
 
 
-def use_library(libname, version=None):
-    lib = load_library(libname, version)
+def use_library(libname, version=None, extra_paths=[]):
+    lib = load_library(libname, version, extra_paths)
 
     def define(func_name, argtypes, restype=None):
         try:
@@ -61,7 +63,9 @@ class CLibrary(object):
         assert foo.foo_func(True, 'Hello!') == 7
     """
     def __init__(self, libname, version=None):
-        self._lib = use_library(libname, version)
+        module_path = sys.modules[self.__class__.__module__].__file__
+        extra_paths = [os.path.dirname(module_path)]
+        self._lib = use_library(libname, version, extra_paths)
 
     def __getattribute__(self, name):
         val = object.__getattribute__(self, name)
