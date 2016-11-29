@@ -165,6 +165,10 @@ class PosixLibraryLoader(LibraryLoader):
     _ld_so_cache = None
 
     def load_library(self, libname, version=None, extra_paths=[]):
+        for dir in extra_paths:  # Favor extra_paths
+            for path in glob.glob("%s/lib%s*.s[ol]*" % (dir, libname)):
+                return self.load(path)
+
         try:
             found = ctypes.util.find_library(libname)
             if found is not None:
