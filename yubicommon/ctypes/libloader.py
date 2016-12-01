@@ -266,8 +266,18 @@ class PosixLibraryLoader(LibraryLoader):
 class _WindowsLibrary(object):
 
     def __init__(self, path):
-        self.cdll = ctypes.cdll.LoadLibrary(path)
-        self.windll = ctypes.windll.LoadLibrary(path)
+        # If the DLL loads additional DLLs we need to be in the correct dir
+        cwd = os.getcwd()
+        dir = os.path.dirname(path)
+        try:
+            if dir:
+                os.chdir(dir)
+                path = os.path.basename(path)
+            self.cdll = ctypes.cdll.LoadLibrary(path)
+            self.windll = ctypes.windll.LoadLibrary(path)
+        finally:
+            if dir:
+                os.chdir(cwd)
 
     def __getattr__(self, name):
         try:
@@ -280,7 +290,7 @@ class _WindowsLibrary(object):
 
 
 class WindowsLibraryLoader(LibraryLoader):
-    name_formats = ["%s.dll", "lib%s.dll", "%slib.dll"]
+    name_formats = ["%s.dll", "lib%s*.dll", "%slib.dll"]
 
     def load_library(self, libname, version=None, extra_paths=[]):
         try:
@@ -315,10 +325,9 @@ class WindowsLibraryLoader(LibraryLoader):
         if os.path.sep not in libname:
             for name in self.name_formats:
                 for dir in extra_paths + ['.']:  # Include cwd
-                    dll_path = os.path.abspath(
-                        os.path.join(dir, name % libname))
-                    if os.path.exists(dll_path):
-                        yield dll_path
+                    pattern = os.path.abspath(os.path.join(dir, name % libname))
+                    for path in glob.glob(pattern):
+                        yield path
                 path = ctypes.util.find_library(name % libname)
                 if path:
                     yield path
